@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/deatil/go-encoding/base62"
 	"github.com/gin-gonic/gin"
 )
 
-var lastID int = len(links) + 1
+var lastID int = len(links)
 
 func SetupRouter() *gin.Engine {
 	//TODO: **add reading last freeID on init
 	router := gin.Default()
 	router.GET("/links", getUrlData)
 	router.GET("/links/:id", getUrlByID)
+	router.GET("/links/total", getTotalID)
 	router.POST("/send", postLink)
 	return router
 }
@@ -29,7 +31,7 @@ func postLink(c *gin.Context) {
 		return
 	}
 	newLink.ID = int(lastID)
-	// newLink.ShortUrl = convertLinkBase62(newLink.ID)
+	newLink.ShortID = convertIDBase62(newLink.ID)
 	links = append(links, newLink)
 	c.IndentedJSON(http.StatusCreated, newLink)
 }
@@ -44,12 +46,10 @@ func getUrlByID(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "ID not found"})
 }
 
-// TODO WRITE FUNC
-// func convertLinkBase62(ID int) string {
-// 	// shortLink := string(base62.StdEncoding.Encode([]byte(links[ID].UrlOrig)))
-// 	shortLink := string(base62.StdEncoding.Encode([]byte{byte(ID)}))
-// 	return shortLink
-// }
+func convertIDBase62(ID int) string {
+	shortLink := string(base62.StdEncoding.Encode([]byte{byte(ID)}))
+	return shortLink
+}
 
 func ConnectPostgres() (*sql.DB, error) {
 	dsn := "host=localhost user=postgres password=postgres dbname=linksdb sslmode=disable port=5432"
@@ -58,4 +58,9 @@ func ConnectPostgres() (*sql.DB, error) {
 		return nil, err
 	}
 	return db, db.Ping()
+}
+
+func getTotalID(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, len(links))
+	// c.IndentedJSON(http.StatusNotFound, gin.H{"message": "ID latest not found"})
 }
