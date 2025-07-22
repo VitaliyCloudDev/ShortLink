@@ -9,14 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var lastID int = len(links)
+var lastID int = len(links) + 1
 
 func SetupRouter() *gin.Engine {
+	// gin.SetMode(gin.ReleaseMode)
 	//TODO: **add reading last freeID on init
 	router := gin.Default()
 	router.GET("/links", getUrlData)
 	router.GET("/links/:id", getUrlByID)
 	router.GET("/links/total", getTotalID)
+	// router.GET("/links/latest", getLatestID)
 	router.POST("/send", postLink)
 	return router
 }
@@ -62,5 +64,4 @@ func ConnectPostgres() (*sql.DB, error) {
 
 func getTotalID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, len(links))
-	// c.IndentedJSON(http.StatusNotFound, gin.H{"message": "ID latest not found"})
 }
