@@ -18,7 +18,7 @@ func SetupRouter() *gin.Engine {
 	router.GET("/links", getUrlData)
 	router.GET("/links/:id", getUrlByID)
 	router.GET("/links/total", getTotalID)
-	// router.GET("/links/latest", getLatestID)
+	router.GET("/links/latest", getLatestID)
 	router.POST("/send", postLink)
 	return router
 }
@@ -64,4 +64,9 @@ func ConnectPostgres() (*sql.DB, error) {
 
 func getTotalID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, len(links))
+}
+
+func getLatestID(c *gin.Context) {
+	latest_id := len(links) - 1
+	c.IndentedJSON(http.StatusOK, latest_id)
 }

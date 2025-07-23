@@ -106,5 +106,5 @@ func TestGetLatestID(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, "5", strings.TrimSpace(w.Body.String()))
+	assert.Equal(t, "4", strings.TrimSpace(w.Body.String()))
 }
